@@ -637,3 +637,189 @@ const BLOG_POSTS = [
 ];
 
 Object.assign(window, { CATEGORIES, PRODUCTS, PROJECTS, STRINGS, COUNTRIES_EN, COUNTRIES_AR, UNSPLASH, DIAL_CODES, FAQ_CATEGORIES, FAQS, BLOG_CATEGORIES, BLOG_POSTS });
+
+/* ============================================================
+   Sanity CMS hydration
+   Called once on app mount.  Fetches live content from Sanity
+   and overrides the static window globals above.
+   Returns true if any Sanity data was found, false otherwise
+   (so the app can fall back to the static data above).
+   ============================================================ */
+window.initFromSanity = async function () {
+  /* sanityFetch and sanityImageUrl are defined in sanity.jsx
+     which is loaded before this file.  Guard in case of mis-order. */
+  if (typeof sanityFetch !== "function") {
+    console.warn("[Sanity] sanityFetch not available – check script order in index.html");
+    return false;
+  }
+
+  const img  = (ref, w) => sanityImageUrl(ref, w);   // shorthand
+  const iurl = (doc, w) => img(doc.imgRef || doc.imageUrl, w); // prefer Sanity asset ref, fall back to URL string
+
+  try {
+    const [cats, liners, projects, faqs, posts, content] = await Promise.all([
+
+      /* ── Categories ── */
+      sanityFetch(`*[_type == "category"] | order(order asc) {
+        id,
+        "en": name.en, "ar": name.ar,
+        "blurb": { "en": blurb.en, "ar": blurb.ar },
+        "imgRef": image.asset._ref,
+        "imageUrl": imageUrl
+      }`, []),
+
+      /* ── Liners / Products ── */
+      sanityFetch(`*[_type == "liner"] | order(order asc) {
+        "id": slug.current,
+        "name": name,
+        "latin": latin,
+        "cat": category,
+        "badge": badge,
+        "price": price,
+        "unit": priceUnit,
+        "moq": moq,
+        "height": height,
+        "pot": potSize,
+        "climate": climate,
+        "water": waterNeed,
+        "sun": sunExposure,
+        "age": age,
+        "imgRef": mainImage.asset._ref,
+        "imageUrl": imageUrl,
+        "galleryRefs": gallery[].asset._ref,
+        "galleryUrls": galleryUrls,
+        "desc": description
+      }`, []),
+
+      /* ── Supply projects ── */
+      sanityFetch(`*[_type == "supplyProject"] | order(order asc) {
+        "id": _id,
+        "title": title,
+        "loc": location,
+        "meta": meta,
+        "imgRef": image.asset._ref,
+        "imageUrl": imageUrl
+      }`, []),
+
+      /* ── FAQ items ── */
+      sanityFetch(`*[_type == "faqItem"] | order(order asc) {
+        "cat": category,
+        "q": question,
+        "a": answer
+      }`, []),
+
+      /* ── Blog posts ── */
+      sanityFetch(`*[_type == "blogPost"] | order(publishedAt desc) {
+        "id": _id,
+        "cat": category,
+        "read": readTime,
+        "publishedAt": publishedAt,
+        "title": title,
+        "excerpt": excerpt,
+        "imgRef": mainImage.asset._ref,
+        "imageUrl": imageUrl
+      }`, []),
+
+      /* ── Site content singleton ── */
+      sanityFetch(`*[_type == "siteContent" && _id == "siteContent"][0]`, null),
+    ]);
+
+    let updated = false;
+
+    /* ── Apply categories ── */
+    if (cats.length) {
+      window.CATEGORIES = cats.map(c => ({
+        id:    c.id,
+        en:    c.en,
+        ar:    c.ar,
+        blurb: c.blurb,
+        img:   iurl(c, 900),
+      }));
+      updated = true;
+    }
+
+    /* ── Apply products ── */
+    if (liners.length) {
+      window.PRODUCTS = liners.map(p => ({
+        id:      p.id,
+        name:    p.name,
+        latin:   p.latin,
+        cat:     p.cat,
+        badge:   p.badge,
+        price:   p.price,
+        unit:    p.unit || "EUR",
+        moq:     p.moq,
+        height:  p.height,
+        pot:     p.pot,
+        climate: p.climate,
+        water:   p.water,
+        sun:     p.sun,
+        age:     p.age,
+        img:     iurl(p, 900),
+        gallery: (p.galleryRefs?.length ? p.galleryRefs.map(r => img(r, 900)) : null)
+               || p.galleryUrls
+               || [],
+        desc:    p.desc,
+      }));
+      updated = true;
+    }
+
+    /* ── Apply projects ── */
+    if (projects.length) {
+      window.PROJECTS = projects.map(p => ({
+        id:    p.id,
+        title: p.title,
+        loc:   p.loc,
+        meta:  p.meta || [],
+        img:   iurl(p, 1200),
+      }));
+      updated = true;
+    }
+
+    /* ── Apply FAQs ── */
+    if (faqs.length) {
+      window.FAQS = faqs;
+      updated = true;
+    }
+
+    /* ── Apply blog posts ── */
+    if (posts.length) {
+      window.BLOG_POSTS = posts.map((p, i) => ({
+        id:      p.id || i + 1,
+        cat:     p.cat,
+        read:    p.read || 5,
+        date:    p.publishedAt
+                   ? new Date(p.publishedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
+                   : "",
+        title:   p.title,
+        excerpt: p.excerpt,
+        img:     iurl(p, 1100),
+      }));
+      updated = true;
+    }
+
+    /* ── Apply site content (deep-merge into STRINGS) ── */
+    if (content) {
+      function deepMerge(target, source) {
+        if (!source || typeof source !== "object") return;
+        Object.entries(source).forEach(([k, v]) => {
+          if (v !== null && v !== undefined && v !== "") {
+            if (typeof v === "object" && !Array.isArray(v) && typeof target[k] === "object") {
+              deepMerge(target[k], v);
+            } else {
+              target[k] = v;
+            }
+          }
+        });
+      }
+      if (content.en) deepMerge(window.STRINGS.en, content.en);
+      if (content.ar) deepMerge(window.STRINGS.ar, content.ar);
+      updated = true;
+    }
+
+    return updated;
+  } catch (err) {
+    console.warn("[Sanity] Load failed, using static data:", err.message);
+    return false;
+  }
+};

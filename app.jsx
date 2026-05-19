@@ -25,6 +25,9 @@ function App() {
   const [{ route, arg }, setNav] = _useState(parseHash());
   const [pendingCat, setPendingCat] = _useState(null);
   const [quoteFor, setQuoteFor] = _useState(null);
+  /* cmsRev flips from 0 → 1 once Sanity data has replaced window globals,
+     which forces the screen <div key=…> to remount with fresh data. */
+  const [cmsRev, setCmsRev] = _useState(0);
 
   _useEffect(() => {
     const onHash = () => setNav(parseHash());
@@ -33,6 +36,14 @@ function App() {
   }, []);
 
   _useEffect(() => { window.scrollTo(0, 0); }, [route, arg]);
+
+  /* ── Sanity hydration ── */
+  _useEffect(() => {
+    if (typeof window.initFromSanity !== "function") return;
+    window.initFromSanity().then(updated => {
+      if (updated) setCmsRev(1);
+    });
+  }, []);
 
   const lang = tweak.lang || "en";
   const t = STRINGS[lang];
@@ -68,7 +79,7 @@ function App() {
   return (
     <>
       <Header route={route} go={go} t={t} lang={lang} setLang={(v)=>setTweak("lang", v)} theme={theme}/>
-      <div key={`${route}-${arg}-${lang}`} className="fade-in">{screen}</div>
+      <div key={`${route}-${arg}-${lang}-${cmsRev}`} className="fade-in">{screen}</div>
       <Footer t={t} go={go} theme={theme}/>
 
       {quoteFor && <QuoteModal product={quoteFor} onClose={()=>setQuoteFor(null)} t={t} lang={lang}/>}

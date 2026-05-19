@@ -1,0 +1,17 @@
+{
+  "name": "bitkihub-studio",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev":   "sanity dev",
+    "build": "sanity build",
+    "start": "sanity start",
+    "deploy": "sanity deploy"
+  },
+  "dependencies": {
+    "sanity": "^3.88.0",
+    "@sanity/vision": "^3.88.0",
+    "react":     "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
