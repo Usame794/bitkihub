@@ -37,12 +37,23 @@ function App() {
 
   _useEffect(() => { window.scrollTo(0, 0); }, [route, arg]);
 
-  /* ── Sanity hydration ── */
+  /* ── Sanity hydration (initial load) ── */
   _useEffect(() => {
     if (typeof window.initFromSanity !== "function") return;
     window.initFromSanity().then(updated => {
       if (updated) setCmsRev(1);
     });
+  }, []);
+
+  /* ── Sanity live preview refresh ──────────────────────────────────────────
+     sanity.jsx fires "sanity:updated" whenever content is published while
+     the site is loaded inside the Studio's Presentation tool iframe.
+     Incrementing cmsRev remounts the active screen with fresh CMS data.
+     ──────────────────────────────────────────────────────────────────────── */
+  _useEffect(() => {
+    const onSanityUpdate = () => setCmsRev(v => v + 1);
+    window.addEventListener("sanity:updated", onSanityUpdate);
+    return () => window.removeEventListener("sanity:updated", onSanityUpdate);
   }, []);
 
   const lang = tweak.lang || "en";

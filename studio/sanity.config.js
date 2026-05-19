@@ -1,6 +1,7 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
+import { presentationTool } from 'sanity/presentation'
 import { schemaTypes } from './schemaTypes/index.js'
 
 const singletons = ['siteContent']
@@ -12,6 +13,25 @@ export default defineConfig({
   dataset:   'production',
 
   plugins: [
+    /* ── Live Preview / Visual Editing ──────────────────────────────────────
+       Opens bitkihub.com in an iframe on the right side of the Studio.
+       The website's visual-editing overlay (loaded from CDN) establishes
+       a postMessage channel so edits on the left reflect in real time.
+       ─────────────────────────────────────────────────────────────────────── */
+    presentationTool({
+      name:  'presentation',
+      title: '🌿 Live Preview',
+      previewUrl: {
+        origin: 'https://bitkihub.com',
+        // Uncomment for local development:
+        // origin: 'http://localhost:8080',
+        previewMode: {
+          enable:  '/preview-enable',   // handled client-side in sanity.jsx
+          disable: '/preview-disable',
+        },
+      },
+    }),
+
     structureTool({
       structure: (S) =>
         S.list()

@@ -54,3 +54,51 @@ async function sanityFetch(query, fallback) {
 
 /* Expose globally so data.jsx and app.jsx can use them */
 Object.assign(window, { sanityFetch, sanityImageUrl, SANITY_PROJECT_ID, SANITY_DATASET });
+
+/* ============================================================
+   Live Preview — active only when the site is loaded inside
+   the Sanity Studio Presentation tool iframe.
+
+   Uses the Sanity Mutations SSE API to detect when content is
+   published, then re-calls initFromSanity() and dispatches
+   "sanity:updated" so app.jsx can remount the screens.
+   ============================================================ */
+;(function initLivePreview() {
+  /* Not in an iframe → normal visitor, do nothing */
+  if (window.self === window.top) return;
+
+  const QUERY = encodeURIComponent(
+    '*[_type in ["liner","category","supplyProject","blogPost","faqItem","siteContent"]]'
+  );
+  const SSE_URL =
+    `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}` +
+    `/data/listen/${SANITY_DATASET}?query=${QUERY}&includeResult=false&visibility=sync`;
+
+  let refreshTimer = null;
+
+  function scheduleRefresh() {
+    /* Debounce: batch rapid mutations (e.g. saving multiple fields) */
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(async () => {
+      if (typeof window.initFromSanity === "function") {
+        await window.initFromSanity();
+      }
+      window.dispatchEvent(new CustomEvent("sanity:updated"));
+    }, 400);
+  }
+
+  function connectSSE() {
+    const es = new EventSource(SSE_URL);
+    es.addEventListener("welcome",  () => console.log("[Sanity] Live preview ready ✓"));
+    es.addEventListener("mutation", scheduleRefresh);
+    es.onerror = () => {
+      es.close();
+      /* Reconnect after 5 s on any error */
+      setTimeout(connectSSE, 5000);
+    };
+  }
+
+  /* data.jsx (and thus initFromSanity) loads after sanity.jsx,
+     so wait for the full page load before connecting. */
+  window.addEventListener("load", connectSSE);
+})();

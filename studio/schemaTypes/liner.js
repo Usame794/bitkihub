@@ -32,7 +32,7 @@ export const liner = {
     /* Catalogue */
     {
       name: 'category', title: 'Category id', type: 'string',
-      description: 'Must match a Category document's "id" field (e.g. hedges, conifers)',
+      description: 'Must match a Category document\'s "id" field (e.g. hedges, conifers)',
       options: {
         list: [
           { title: 'Hedging & Screening',       value: 'hedges' },

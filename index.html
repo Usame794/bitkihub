@@ -33,5 +33,23 @@
 <script type="text/babel" src="components.jsx"></script>
 <script type="text/babel" src="screens.jsx"></script>
 <script type="text/babel" src="app.jsx"></script>
+
+<!--
+  Sanity Visual Editing overlay
+  ─────────────────────────────
+  Loaded as a true ES module — runs independently of Babel.
+  Only active when the page is embedded in the Sanity Studio
+  Presentation tool iframe; does nothing on the live public site.
+
+  What it does:
+  • Establishes a postMessage channel between this page and the Studio
+  • Shows a "Preview" toolbar at the top of the iframe
+  • Highlights editable regions when you hover over documents in the Studio
+  • Lets you click elements to jump directly to the right field in the Studio
+-->
+<script type="module">
+  import { enableVisualEditing } from 'https://esm.sh/@sanity/visual-editing@2'
+  enableVisualEditing({ zIndex: 999999 })
+</script>
 </body>
 </html>
