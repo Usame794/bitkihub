@@ -154,7 +154,7 @@ const ProductCard = ({ p, lang, t, go, style }) => (
       <div className="product-card__footer">
         <div className="price">
           <span className="from">{lang==="en" ? "from" : "ابتداء من"}</span>
-          ${p.price}
+          €{p.price.toFixed(2)}
         </div>
         <span className="quote-cta">{t.cta.view} <Icon name="arrow" size={12}/></span>
       </div>
@@ -287,7 +287,7 @@ const QuoteModal = ({ product, onClose, t, lang }) => {
 /* ============================================================
    WhatsApp floating action button — on every page
    ============================================================ */
-function WhatsAppFAB({ phone = "905555555555", lang = "en" }) {
+function WhatsAppFAB({ phone = "905013200987", lang = "en" }) {
   const [open, setOpen] = useState(false);
   const msg = lang === "ar"
     ? "مرحباً، أرغب بالاستفسار عن منتجاتكم."
@@ -473,7 +473,7 @@ function SpecimenCard({ p, lang, t, go, idx }) {
         <div className="specimen-card__row">
           <span>{p.height}</span>
           <div className="specimen-card__price">
-            <small>{lang==="en" ? "from" : "من"}</small>${p.price}
+            <small>{lang==="en" ? "from" : "من"}</small>€{p.price.toFixed(2)}
           </div>
         </div>
       </div>

@@ -282,7 +282,7 @@ const Home = ({ t, go, lang, tweaks, openQuote, cardStyle }) => {
       {/* Stats band — supercharged */}
       <section className="stats-band tight">
         <div className="stats-band__mark">
-          <LeafMark size={600} color="#fff"/>
+          <LeafMark size={320} color="#fff"/>
         </div>
         <div className="container">
           <h2 className="display-italic-serif">{t.statsTitle}</h2>
@@ -537,8 +537,8 @@ const ProductDetail = ({ t, lang, go, productId, openQuote, cardStyle }) => {
               <div>
                 <div className="from">{lang==="en"?"From":"ابتداء من"}</div>
                 <div style={{display:"flex", alignItems:"baseline", gap: 8}}>
-                  <span className="price">${product.price}</span>
-                  <span className="unit">/ {lang==="en"?"specimen":"نبتة"}</span>
+                  <span className="price">€{product.price.toFixed(2)}</span>
+                  <span className="unit">/ {lang==="en"?"liner":"شتلة"}</span>
                 </div>
                 <div className="moq">{lang==="en"?"Minimum order:":"الحد الأدنى:"} {product.moq} {lang==="en"?"units":"نبتة"}</div>
               </div>
@@ -645,7 +645,7 @@ const Contact = ({ t, lang, go }) => {
                 <div className="ic"><Icon name="phone" size={18}/></div>
                 <div>
                   <h4>{lang==="en"?"Sales — MENA":"المبيعات"}</h4>
-                  <p>+90 226 — — —</p>
+                  <p dir="ltr">+90 501 320 09 87</p>
                   <small>{lang==="en"?"WhatsApp available":"واتساب متوفر"}</small>
                 </div>
               </div>
@@ -653,7 +653,7 @@ const Contact = ({ t, lang, go }) => {
                 <div className="ic"><Icon name="mail" size={18}/></div>
                 <div>
                   <h4>{lang==="en"?"Email":"البريد الإلكتروني"}</h4>
-                  <p>sales@bitkihub.com</p>
+                  <p>info@bitkihub.com</p>
                   <small>{lang==="en"?"Response within 1 working day":"الرد خلال يوم عمل"}</small>
                 </div>
               </div>
@@ -832,8 +832,8 @@ const HomeContactForm = ({ t, lang, go }) => {
   const [form, setForm] = useS({ name: "", email: "", phone: "", phoneCountry: "SA", company: "", message: "" });
   const [done, setDone] = useS(false);
   const [errors, setErrors] = useS({});
-  const phone = "+90 555 555 5555";
-  const waNumber = "905555555555";
+  const phone = "+90 501 320 09 87";
+  const waNumber = "905013200987";
   const upd = (k, v) => setForm({ ...form, [k]: v });
   const submit = () => {
     const e = {};
@@ -866,7 +866,7 @@ const HomeContactForm = ({ t, lang, go }) => {
           <div className="home-contact__chan mail">
             <div className="ic"><Icon name="mail" size={18}/></div>
             <div>
-              <strong>sales@bitkihub.com</strong>
+              <strong>info@bitkihub.com</strong>
               <small>{lang==="en" ? "Trade enquiries only" : "استفسارات الجملة"}</small>
             </div>
           </div>
@@ -1127,7 +1127,7 @@ const Privacy = ({ t, lang, go }) => {
       body: (
         <>
           <p>Bitki Hub Tarım Ltd. Şti. ("Bitki Hub", "we", "us") is a wholesale plant nursery based in Yalova, Türkiye. This Privacy Policy explains what information we collect when you contact us about plants, browse our catalogue, or do business with us — and what we do with it.</p>
-          <p>If anything here is unclear, write to <strong>privacy@bitkihub.com</strong> and a real person will reply.</p>
+          <p>If anything here is unclear, write to <strong>info@bitkihub.com</strong> and a real person will reply.</p>
         </>
       ) },
     { id: "collect", title: "What we collect",
@@ -1190,13 +1190,13 @@ const Privacy = ({ t, lang, go }) => {
             <li>Delete your data (subject to legal retention obligations).</li>
             <li>Object to processing or withdraw consent for marketing.</li>
           </ul>
-          <p>Send any request to <strong>privacy@bitkihub.com</strong>. We respond within 30 days.</p>
+          <p>Send any request to <strong>info@bitkihub.com</strong>. We respond within 30 days.</p>
         </>
       ) },
     { id: "contact", title: "Contact",
       body: (
         <>
-          <p>Bitki Hub Tarım Ltd. Şti.<br/>Yalova, Türkiye<br/>privacy@bitkihub.com</p>
+          <p>Bitki Hub Tarım Ltd. Şti.<br/>Yalova, Türkiye<br/>info@bitkihub.com</p>
           <p>This policy was last updated on May 16, 2026. If we make material changes, we'll post a notice here and email anyone whose data is affected.</p>
         </>
       ) },
@@ -1208,7 +1208,7 @@ const Privacy = ({ t, lang, go }) => {
       body: (
         <>
           <p>شركة بِتكي هَب الزراعية المحدودة ("بِتكي هَب"، "نحن") مشتل جملة في يالوفا، تركيا. توضح هذه السياسة ما نجمعه من معلومات عندما تتواصل معنا أو تتصفح كتالوجنا، وكيف نستخدمها.</p>
-          <p>لأي استفسار، راسلنا على <strong>privacy@bitkihub.com</strong>.</p>
+          <p>لأي استفسار، راسلنا على <strong>info@bitkihub.com</strong>.</p>
         </>
       ) },
     { id: "collect", title: "ما الذي نجمعه",
@@ -1262,13 +1262,13 @@ const Privacy = ({ t, lang, go }) => {
             <li>طلب حذف بياناتك (مع مراعاة الالتزامات القانونية).</li>
             <li>الاعتراض على المعالجة أو سحب الموافقة على التسويق.</li>
           </ul>
-          <p>راسلنا على <strong>privacy@bitkihub.com</strong> وسنرد خلال 30 يوماً.</p>
+          <p>راسلنا على <strong>info@bitkihub.com</strong> وسنرد خلال 30 يوماً.</p>
         </>
       ) },
     { id: "contact", title: "تواصل",
       body: (
         <>
-          <p>شركة بِتكي هَب الزراعية المحدودة<br/>يالوفا، تركيا<br/>privacy@bitkihub.com</p>
+          <p>شركة بِتكي هَب الزراعية المحدودة<br/>يالوفا، تركيا<br/>info@bitkihub.com</p>
           <p>آخر تحديث: 16 مايو 2026. عند أي تغيير جوهري، سنُعلِم المتأثرين.</p>
         </>
       ) },
@@ -1308,7 +1308,7 @@ const Privacy = ({ t, lang, go }) => {
             <div className="legal-meta">
               <div><strong>{lang==="en" ? "Effective date" : "تاريخ السريان"}</strong> May 16, 2026</div>
               <div><strong>{lang==="en" ? "Jurisdiction" : "الاختصاص"}</strong> Türkiye / GDPR / KVKK</div>
-              <div><strong>{lang==="en" ? "Contact" : "للتواصل"}</strong> privacy@bitkihub.com</div>
+              <div><strong>{lang==="en" ? "Contact" : "للتواصل"}</strong> info@bitkihub.com</div>
             </div>
             {sections.map((s, i) => (
               <section key={s.id} id={s.id}>
