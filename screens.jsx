@@ -295,32 +295,6 @@ const Home = ({ t, go, lang, tweaks, openQuote, cardStyle }) => {
         </div>
       </section>
 
-      {/* Projects */}
-      <section>
-        <div className="container">
-          <div className="editorial-start">
-            <div className="marker editorial-start__num">05</div>
-            <div className="editorial-start__body">
-              <span className="eyebrow">{t.projectsEyebrow}</span>
-              <h2 style={{marginTop:14}}>{t.projectsTitle}</h2>
-              <p>{t.projectsSub}</p>
-            </div>
-          </div>
-          <div className="projects">
-            {PROJECTS.map(pr => (
-              <a key={pr.id} className="project" href="#">
-                <img src={pr.img} alt={pr.title[lang]}/>
-                <div className="project__overlay">
-                  <span className="project__loc">{pr.loc}</span>
-                  <div className="project__title">{pr.title[lang]}</div>
-                  <div className="project__meta">{pr.meta.map(m => <span key={m}>{m}</span>)}</div>
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Certifications */}
       <section className="tight" style={{background: "var(--surface-2)"}}>
         <div className="container">
