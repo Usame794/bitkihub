@@ -1,12 +1,38 @@
 /* Bitki Hub — root app, router + Tweaks */
 const { useState: _useState, useEffect: _useEffect } = React;
 
+/* ── Language detection ──────────────────────────────────────────────────────
+   Priority order:
+     1. localStorage  — user's explicit manual choice (survives reloads)
+     2. navigator.language — Arabic browser setting
+     3. IP geolocation — country-based detection (async, first visit only)
+     4. Default: "en"
+   ─────────────────────────────────────────────────────────────────────────── */
+const _ARABIC_COUNTRIES = new Set([
+  'SA','AE','EG','KW','QA','BH','OM','JO','IQ','LB','SY','LY','TN','DZ','MA'
+]);
+const _LANG_KEY  = 'bitkihub_lang';
+const _getLang   = () => { try { return localStorage.getItem(_LANG_KEY) } catch { return null } };
+const _saveLang  = (l) => { try { localStorage.setItem(_LANG_KEY, l)   } catch {} };
+
+/* Runs synchronously — zero render flash */
+const __INITIAL_LANG = (() => {
+  const saved = _getLang();
+  if (saved === 'ar' || saved === 'en') return saved;
+  /* Arabic browser locale → save so the async IP check skips on next visit */
+  if ((navigator.language || '').toLowerCase().startsWith('ar')) {
+    _saveLang('ar');
+    return 'ar';
+  }
+  return 'en'; // IP check in useEffect may upgrade this for Arabic-country visitors
+})();
+
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "light",
   "hero": "split",
   "density": "comfortable",
   "cardStyle": "default",
-  "lang": "en"
+  "lang": __INITIAL_LANG
 }/*EDITMODE-END*/;
 
 /* Simple hash router: #home, #products, #products/cat=palms, #product/olea-europaea-150, #contact, #projects, #about */
@@ -56,6 +82,29 @@ function App() {
     return () => window.removeEventListener("sanity:updated", onSanityUpdate);
   }, []);
 
+  /* ── IP-based language detection ─────────────────────────────────────────
+     Only runs when there is no stored preference (first visit from a
+     non-Arabic browser). Calls ipapi.co to get the visitor's country and
+     switches to Arabic if they're in an Arabic-speaking country.
+     Aborts after 2.5 s so it never hangs the page.
+     ──────────────────────────────────────────────────────────────────────── */
+  _useEffect(() => {
+    if (_getLang()) return; /* Stored preference exists — skip */
+    const ctrl  = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 2500);
+    fetch('https://ipapi.co/json/', { signal: ctrl.signal })
+      .then(r => r.json())
+      .then(({ country_code }) => {
+        clearTimeout(timer);
+        if (_getLang()) return; /* User switched manually while we were fetching */
+        const detected = _ARABIC_COUNTRIES.has(country_code) ? 'ar' : 'en';
+        _saveLang(detected);
+        setTweak('lang', detected);
+      })
+      .catch(() => clearTimeout(timer));
+    return () => { ctrl.abort(); clearTimeout(timer); };
+  }, []);
+
   const lang = tweak.lang || "en";
   const t = STRINGS[lang];
   const theme = tweak.theme;
@@ -89,7 +138,7 @@ function App() {
 
   return (
     <>
-      <Header route={route} go={go} t={t} lang={lang} setLang={(v)=>setTweak("lang", v)} theme={theme}/>
+      <Header route={route} go={go} t={t} lang={lang} setLang={(v)=>{ _saveLang(v); setTweak("lang", v); }} theme={theme}/>
       <div key={`${route}-${arg}-${lang}-${cmsRev}`} className="fade-in">{screen}</div>
       <Footer t={t} go={go} theme={theme}/>
 
