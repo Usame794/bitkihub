@@ -22,13 +22,11 @@ export default defineConfig({
       name:  'presentation',
       title: '🌿 Live Preview',
       previewUrl: {
+        // Static site — no server-side preview route needed.
+        // The visual-editing overlay in index.html handles the channel.
         origin: 'https://bitkihub.com',
         // Uncomment for local development:
         // origin: 'http://localhost:8080',
-        previewMode: {
-          enable:  '/preview-enable',   // handled client-side in sanity.jsx
-          disable: '/preview-disable',
-        },
       },
     }),
 
