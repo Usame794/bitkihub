@@ -399,7 +399,7 @@ const Products = ({ t, lang, go, initialCat, cardStyle }) => {
       </div>
 
       <div className="product-toolbar">
-        <div className="container" style={{display: "flex", alignItems: "center", justifyContent:"space-between", gap: 16, width: "100%"}}>
+        <div className="container toolbar-inner">
           <div className="chip-row">
             {allCats.map(([id, label, count]) => (
               <button key={id} className={`chip ${cat === id ? "is-active" : ""}`} onClick={()=>setCat(id)}>
