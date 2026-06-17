@@ -44,6 +44,15 @@ const Icon = ({ name, size = 18, stroke = 1.6, ...rest }) => {
    ============================================================ */
 const Header = ({ route, go, t, lang, setLang, theme }) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [logoFailed, setLogoFailed] = React.useState(false);
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth < 768);
+
+  React.useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+
   const items = [
     ["home", t.nav.home],
     ["products", t.nav.products],
@@ -55,39 +64,96 @@ const Header = ({ route, go, t, lang, setLang, theme }) => {
   ];
   const logoSrc = theme === "dark" ? "assets/logo-white.png" : "assets/logo-on-light.png";
   const handleNav = (id) => { go(id); setMenuOpen(false); };
+
+  const LogoEl = () => (
+    <a className="site-header__logo" href="#" onClick={(e) => { e.preventDefault(); go("home"); }}>
+      {!logoFailed
+        ? <img src={logoSrc} alt="Bitki Hub"
+            style={{height:"40px",width:"auto",display:"block"}}
+            onError={() => setLogoFailed(true)} />
+        : <span style={{fontWeight:800,fontSize:"18px",letterSpacing:"-0.01em"}}>Bitki Hub</span>
+      }
+    </a>
+  );
+
   return (
-    <header className="site-header">
-      <div className="container site-header__inner">
-        <a className="site-header__logo" href="#" onClick={(e)=>{e.preventDefault(); go("home");}}>
-          <img src={logoSrc} alt="Bitki Hub" style={{height:"40px",width:"auto",display:"block"}} />
-        </a>
-        <nav className={`site-header__nav${menuOpen ? " is-open" : ""}`}>
-          {items.map(([id, label]) => (
-            <a key={id} href={`#${id}`} className={route === id || (id==="products" && route==="product") ? "is-active" : ""}
-              onClick={(e) => { e.preventDefault(); handleNav(id); }}>
-              {label}
-            </a>
-          ))}
-        </nav>
-        <div className="site-header__spacer"></div>
-        <div className="lang-toggle" role="group" aria-label="Language">
-          <button className={lang==="en"?"is-active":""} onClick={()=>setLang("en")}>EN</button>
-          <button className={lang==="ar"?"is-active":""} onClick={()=>setLang("ar")}>ع</button>
+    <>
+      <header className="site-header">
+        <div className="container site-header__inner">
+          <LogoEl />
+
+          {!isMobile && (
+            <nav className="site-header__nav">
+              {items.map(([id, label]) => (
+                <a key={id} href={`#${id}`}
+                  className={route === id || (id==="products" && route==="product") ? "is-active" : ""}
+                  onClick={(e) => { e.preventDefault(); handleNav(id); }}>
+                  {label}
+                </a>
+              ))}
+            </nav>
+          )}
+
+          <div className="site-header__spacer"></div>
+
+          {!isMobile && (
+            <>
+              <div className="lang-toggle" role="group" aria-label="Language">
+                <button className={lang==="en"?"is-active":""} onClick={()=>setLang("en")}>EN</button>
+                <button className={lang==="ar"?"is-active":""} onClick={()=>setLang("ar")}>ع</button>
+              </div>
+              <button className="btn btn--primary" onClick={()=>go("contact")}>
+                {t.requestQuote}
+                <span className="arrow"><Icon name="arrow" size={14}/></span>
+              </button>
+            </>
+          )}
+
+          {isMobile && (
+            <button
+              className="nav-hamburger"
+              aria-label="Toggle navigation"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(o => !o)}
+            >
+              {menuOpen ? "✕" : "☰"}
+            </button>
+          )}
         </div>
-        <button className="btn btn--primary" onClick={()=>go("contact")}>
-          {t.requestQuote}
-          <span className="arrow"><Icon name="arrow" size={14}/></span>
-        </button>
-        <button
-          className="nav-hamburger"
-          aria-label="Toggle navigation"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(o => !o)}
-        >
-          {menuOpen ? "✕" : "☰"}
-        </button>
-      </div>
-    </header>
+      </header>
+
+      {isMobile && menuOpen && (
+        <div className="mobile-overlay" onClick={() => setMenuOpen(false)}>
+          <div className="mobile-overlay__panel" onClick={e => e.stopPropagation()}>
+            <div className="mobile-overlay__top">
+              <span className="mobile-overlay__brand">Bitki Hub</span>
+              <button className="mobile-overlay__close" onClick={() => setMenuOpen(false)}>✕</button>
+            </div>
+            <nav className="mobile-overlay__nav">
+              {items.map(([id, label]) => (
+                <a key={id} href={`#${id}`}
+                  className={route === id || (id==="products" && route==="product") ? "is-active" : ""}
+                  onClick={(e) => { e.preventDefault(); handleNav(id); }}>
+                  {label}
+                </a>
+              ))}
+            </nav>
+            <div className="mobile-overlay__footer">
+              <div className="lang-toggle" role="group" aria-label="Language">
+                <button className={lang==="en"?"is-active":""} onClick={()=>setLang("en")}>EN</button>
+                <button className={lang==="ar"?"is-active":""} onClick={()=>setLang("ar")}>ع</button>
+              </div>
+              <button className="btn btn--primary"
+                style={{width:"100%",justifyContent:"center"}}
+                onClick={() => { go("contact"); setMenuOpen(false); }}>
+                {t.requestQuote}
+                <span className="arrow"><Icon name="arrow" size={14}/></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
