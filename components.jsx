@@ -249,17 +249,40 @@ const QuoteModal = ({ product, onClose, t, lang }) => {
   const [country, setCountry] = useState("SA");
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState(false);
+  const [deliveryCountry, setDeliveryCountry] = useState("Saudi Arabia");
   if (!product) return null;
 
   const useEmail = method === "email" || method === "both";
   const useWA    = method === "whatsapp" || method === "both";
 
-  const submit = () => {
+  const submit = async () => {
     const e = {};
     if (useEmail && (!email || !email.includes("@"))) e.email = true;
     if (useWA && !phone) e.phone = true;
     setErrors(e);
-    if (Object.keys(e).length === 0) setSubmitted(true);
+    if (Object.keys(e).length > 0) return;
+    setSending(true);
+    setSendError(false);
+    try {
+      const res = await fetch("https://formspree.io/f/REPLACE_WITH_YOUR_ENDPOINT", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          _subject: `Quick Quote — ${product.name.en}`,
+          plant: `${product.name.en} (${product.latin})`,
+          quantity: qty,
+          reply_via: method,
+          email: useEmail ? email : undefined,
+          whatsapp_number: useWA ? phone : undefined,
+          delivery_country: deliveryCountry,
+        }),
+      });
+      if (res.ok) { setSubmitted(true); }
+      else { setSendError(true); }
+    } catch { setSendError(true); }
+    finally { setSending(false); }
   };
 
   const methodOpts = [
@@ -323,14 +346,25 @@ const QuoteModal = ({ product, onClose, t, lang }) => {
 
             <div className="field" style={{marginBottom: 24}}>
               <label>{lang==="en"?"Country of delivery":"دولة التسليم"}</label>
-              <select>
+              <select value={deliveryCountry} onChange={e => setDeliveryCountry(e.target.value)}>
                 {(lang==="en" ? COUNTRIES_EN : COUNTRIES_AR).map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
 
-            <button className="btn btn--dark btn--lg" style={{width:"100%", justifyContent:"center"}} onClick={submit}>
-              {lang==="en"?"Send quote request":"إرسال طلب السعر"}
-              <span className="arrow"><Icon name="arrow" size={14}/></span>
+            {sendError && (
+              <div style={{color:"#c0392b", fontSize:13, marginBottom:12, padding:"10px 14px", background:"rgba(192,57,43,.08)", borderRadius:8}}>
+                {lang === "en"
+                  ? "Something went wrong. Please try again or email us at info@bitkihub.com"
+                  : "حدث خطأ. يرجى المحاولة مجدداً أو التواصل عبر البريد info@bitkihub.com"}
+              </div>
+            )}
+
+            <button className="btn btn--dark btn--lg" style={{width:"100%", justifyContent:"center"}}
+              onClick={submit} disabled={sending}>
+              {sending
+                ? (lang==="en" ? "Sending…" : "جارٍ الإرسال…")
+                : (lang==="en" ? "Send quote request" : "إرسال طلب السعر")}
+              {!sending && <span className="arrow"><Icon name="arrow" size={14}/></span>}
             </button>
 
             <div style={{marginTop: 14, textAlign: "center", fontSize: 12, color: "var(--text-soft)"}}>

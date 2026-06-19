@@ -581,19 +581,44 @@ const Contact = ({ t, lang, go }) => {
   });
   const [errors, setErrors] = useS({});
   const [done, setDone] = useS(false);
+  const [sending, setSending] = useS(false);
+  const [sendError, setSendError] = useS(false);
 
   const upd = (k, v) => setForm({...form, [k]: v});
 
-  const submit = () => {
+  const submit = async () => {
     const e = {};
     if (!form.name) e.name = true;
     if (!form.email || !form.email.includes("@")) e.email = true;
     if (!form.company) e.company = true;
     setErrors(e);
-    if (Object.keys(e).length === 0) {
-      setDone(true);
-      window.scrollTo({top: 0, behavior:"smooth"});
-    }
+    if (Object.keys(e).length > 0) return;
+    setSending(true);
+    setSendError(false);
+    try {
+      const res = await fetch("https://formspree.io/f/REPLACE_WITH_YOUR_ENDPOINT", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify({
+          _subject: `Contact Form — ${form.name} (${form.company})`,
+          name: form.name,
+          company: form.company,
+          email: form.email,
+          phone: form.phone,
+          buyer_type: form.buyer,
+          delivery_country: form.country,
+          species_interest: form.species,
+          message: form.message,
+        }),
+      });
+      if (res.ok) {
+        setDone(true);
+        window.scrollTo({top: 0, behavior:"smooth"});
+      } else {
+        setSendError(true);
+      }
+    } catch { setSendError(true); }
+    finally { setSending(false); }
   };
 
   const buyers = ["Landscaper", "Developer", "Nursery", "Other"];
@@ -708,11 +733,18 @@ const Contact = ({ t, lang, go }) => {
                     </div>
                   </div>
 
+                  {sendError && (
+                    <div style={{color:"#c0392b", fontSize:13, marginBottom:12, padding:"10px 14px", background:"rgba(192,57,43,.08)", borderRadius:8}}>
+                      {lang==="en"
+                        ? "Something went wrong. Please try again or email us at info@bitkihub.com"
+                        : "حدث خطأ. يرجى المحاولة مجدداً أو التواصل عبر info@bitkihub.com"}
+                    </div>
+                  )}
                   <div className="form-submit-row">
                     <small>{t.submitNote}</small>
-                    <button className="btn btn--dark btn--lg" onClick={submit}>
-                      {t.submit}
-                      <span className="arrow"><Icon name="arrow" size={14}/></span>
+                    <button className="btn btn--dark btn--lg" onClick={submit} disabled={sending}>
+                      {sending ? (lang==="en" ? "Sending…" : "جارٍ الإرسال…") : t.submit}
+                      {!sending && <span className="arrow"><Icon name="arrow" size={14}/></span>}
                     </button>
                   </div>
                 </>
