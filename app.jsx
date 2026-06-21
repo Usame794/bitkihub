@@ -132,6 +132,7 @@ function App() {
   else if (route === "projects") screen = <SimplePage t={t} lang={lang} go={go} kind="projects"/>;
   else if (route === "about") screen = <SimplePage t={t} lang={lang} go={go} kind="about"/>;
   else if (route === "blog") screen = <Blog t={t} lang={lang} go={go}/>;
+  else if (route === "post") screen = <BlogPost t={t} lang={lang} go={go} postId={arg}/>;
   else if (route === "faq") screen = <FAQ t={t} lang={lang} go={go}/>;
   else if (route === "privacy") screen = <Privacy t={t} lang={lang} go={go}/>;
   else screen = <Home t={t} go={go} lang={lang} tweaks={tweak} openQuote={setQuoteFor} cardStyle={tweak.cardStyle}/>;

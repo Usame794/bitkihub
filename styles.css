@@ -2046,6 +2046,50 @@ section.tight { padding: var(--pad-block) 0; }
 }
 
 /* ============================================================
+   Blog post detail page
+   ============================================================ */
+.blog-post-hero {
+  height: 460px;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.blog-post-hero img { width: 100%; height: 100%; object-fit: cover; }
+.blog-post-container { max-width: 780px; padding-bottom: 80px; }
+.blog-post-meta {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 13px; color: var(--text-soft);
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.blog-post-cat {
+  background: var(--brand-soft); color: var(--brand);
+  padding: 4px 12px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+}
+[data-theme="dark"] .blog-post-cat { background: var(--green-900); color: var(--lime-400); }
+.blog-post-title {
+  font-size: clamp(28px, 5vw, 52px);
+  line-height: 1.05;
+  margin-bottom: 32px;
+}
+.blog-post-body {
+  font-size: 18px; line-height: 1.75; color: var(--text-soft);
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--border);
+}
+.blog-post-footer {
+  display: flex; gap: 12px; align-items: center;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--border);
+}
+.blog-post-related { padding: 48px 0 0; }
+@media (max-width: 768px) {
+  .blog-post-hero { height: 220px; }
+  .blog-post-body { font-size: 16px; }
+  .blog-post-footer { flex-direction: column; align-items: stretch; }
+  .blog-post-footer .btn { width: 100%; justify-content: center; }
+}
+
+/* ============================================================
    FAQ page — accordion
    ============================================================ */
 .faq-layout {

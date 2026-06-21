@@ -980,7 +980,7 @@ const Blog = ({ t, lang, go }) => {
       <section>
         <div className="container">
           {feature && (
-            <a href="#" className="blog-feature" onClick={(e)=>e.preventDefault()}>
+            <a href="#" className="blog-feature" onClick={(e)=>{e.preventDefault(); go("post", feature.id);}}>
               <div className="blog-feature__media">
                 <img src={feature.img} alt={feature.title[lang]}/>
               </div>
@@ -1008,7 +1008,8 @@ const Blog = ({ t, lang, go }) => {
           {rest.length > 0 && (
             <div className="blog-grid">
               {rest.map(post => (
-                <a key={post.id} href="#" className="blog-card" onClick={(e)=>e.preventDefault()}>
+                <a key={post.id} href="#" className="blog-card"
+                  onClick={(e)=>{e.preventDefault(); go("post", post.id);}}>
                   <div className="blog-card__media">
                     <img src={post.img} alt={post.title[lang]}/>
                   </div>
@@ -1332,4 +1333,74 @@ const Privacy = ({ t, lang, go }) => {
   );
 };
 
-Object.assign(window, { Home, Products, ProductDetail, Contact, SimplePage, HomeContactForm, Blog, FAQ, Privacy });
+const BlogPost = ({ t, lang, go, postId }) => {
+  const post = BLOG_POSTS.find(p => String(p.id) === String(postId)) || BLOG_POSTS[0];
+  const cat  = BLOG_CATEGORIES.find(c => c.id === post.cat) || BLOG_CATEGORIES[1];
+  const related = BLOG_POSTS.filter(p => String(p.id) !== String(postId) && p.cat === post.cat).slice(0, 3);
+
+  useE(() => { window.scrollTo(0, 0); }, [postId]);
+
+  return (
+    <main>
+      <div className="blog-post-hero">
+        <img src={post.img} alt={post.title[lang]} />
+      </div>
+
+      <div className="container blog-post-container">
+        <div className="crumbs" style={{fontSize:12,color:"var(--text-soft)",margin:"32px 0 20px",textTransform:"uppercase",letterSpacing:".12em"}}>
+          <a href="#" onClick={(e)=>{e.preventDefault(); go("home");}}>{t.nav.home}</a>
+          {" / "}
+          <a href="#" onClick={(e)=>{e.preventDefault(); go("blog");}}>{t.nav.blog}</a>
+          {" / "}
+          <span>{cat[lang]}</span>
+        </div>
+
+        <div className="blog-post-meta">
+          <span className="blog-post-cat">{cat[lang]}</span>
+          <span>{post.date}</span>
+          <span>·</span>
+          <span>{post.read} {lang==="en"?"min read":"دقائق قراءة"}</span>
+        </div>
+
+        <h1 className="blog-post-title">{post.title[lang]}</h1>
+
+        <div className="blog-post-body">
+          <p>{post.excerpt[lang]}</p>
+        </div>
+
+        <div className="blog-post-footer">
+          <button className="btn btn--ghost" onClick={()=>go("blog")}>
+            ← {lang==="en"?"Back to field journal":"العودة إلى يوميات الحقل"}
+          </button>
+          <button className="btn btn--primary" onClick={()=>go("contact")}>
+            {t.requestQuote}
+            <span className="arrow"><Icon name="arrow" size={14}/></span>
+          </button>
+        </div>
+
+        {related.length > 0 && (
+          <div className="blog-post-related">
+            <h3 style={{marginBottom: 24}}>{lang==="en"?"More from the journal":"المزيد من اليوميات"}</h3>
+            <div className="blog-grid">
+              {related.map(p => (
+                <a key={p.id} href="#" className="blog-card"
+                  onClick={(e)=>{e.preventDefault(); go("post", p.id);}}>
+                  <div className="blog-card__media"><img src={p.img} alt={p.title[lang]}/></div>
+                  <div className="blog-card__cat">{BLOG_CATEGORIES.find(c=>c.id===p.cat)[lang]}</div>
+                  <h3 className="blog-card__title">{p.title[lang]}</h3>
+                  <p className="blog-card__excerpt">{p.excerpt[lang]}</p>
+                  <div className="blog-card__meta">
+                    <span>{p.date}</span><span>·</span>
+                    <span>{p.read} {lang==="en"?"min":"د"}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
+  );
+};
+
+Object.assign(window, { Home, Products, ProductDetail, Contact, SimplePage, HomeContactForm, Blog, BlogPost, FAQ, Privacy });
