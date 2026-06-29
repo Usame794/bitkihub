@@ -1,3 +1,4 @@
+import { lead }          from './lead.js'
 import { liner }         from './liner.js'
 import { category }      from './category.js'
 import { supplyProject } from './supplyProject.js'
@@ -6,10 +7,11 @@ import { faqItem }       from './faqItem.js'
 import { siteContent }   from './siteContent.js'
 
 export const schemaTypes = [
-  siteContent,
+  lead,
   liner,
   category,
   supplyProject,
   blogPost,
   faqItem,
+  siteContent,
 ]

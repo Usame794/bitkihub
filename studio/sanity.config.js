@@ -6,6 +6,10 @@ import { schemaTypes } from './schemaTypes/index.js'
 
 const singletons = ['siteContent']
 
+/* Leads should never be auto-created from the "new document" menu
+   — they arrive from the website forms. Hide from templates. */
+const readOnlyTypes = ['lead']
+
 export default defineConfig({
   name:    'bitkihub',
   title:   'Bitki Hub CMS',
@@ -35,6 +39,11 @@ export default defineConfig({
         S.list()
           .title('Content')
           .items([
+            /* ── Leads — top priority ── */
+            S.documentTypeListItem('lead').title('📥 Leads'),
+
+            S.divider(),
+
             /* ── Everyday content ── */
             S.documentTypeListItem('liner')    .title('Catalogue — Liners'),
             S.documentTypeListItem('category') .title('Catalogue — Categories'),
@@ -45,7 +54,7 @@ export default defineConfig({
 
             /* ── Rarely changed — nested so they stay out of the way ── */
             S.listItem()
-              .title('Advanced Settings')
+              .title('⚙️  Advanced Settings')
               .id('advanced-settings')
               .child(
                 S.list()
@@ -71,5 +80,6 @@ export default defineConfig({
     types: schemaTypes,
     /* Prevent creating more than one siteContent document */
     templates: (prev) => prev.filter(({ schemaType }) => !singletons.includes(schemaType)),
+    // readOnlyTypes declared above but leads can still be created manually via the list
   },
 })

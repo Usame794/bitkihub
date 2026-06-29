@@ -596,27 +596,33 @@ const Contact = ({ t, lang, go }) => {
     setSending(true);
     setSendError(false);
     try {
-      const res = await fetch("https://formspree.io/f/REPLACE_WITH_YOUR_ENDPOINT", {
+      // Primary: save lead to Sanity CMS → visible in Studio dashboard
+      await sanityMutate([{ create: {
+        _type:           'lead',
+        createdAt:       new Date().toISOString(),
+        source:          'contact-form',
+        name:            form.name,
+        company:         form.company,
+        email:           form.email,
+        phone:           form.phone,
+        plant:           form.species || undefined,
+        deliveryCountry: form.country,
+        message:         form.message || undefined,
+      }}]);
+      // Backup: also fire Formspree email (silent, non-blocking)
+      fetch("https://formspree.io/f/REPLACE_WITH_YOUR_ENDPOINT", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
           _subject: `Contact Form — ${form.name} (${form.company})`,
-          name: form.name,
-          company: form.company,
-          email: form.email,
-          phone: form.phone,
-          buyer_type: form.buyer,
-          delivery_country: form.country,
-          species_interest: form.species,
-          message: form.message,
+          name: form.name, company: form.company,
+          email: form.email, phone: form.phone,
+          buyer_type: form.buyer, delivery_country: form.country,
+          species_interest: form.species, message: form.message,
         }),
-      });
-      if (res.ok) {
-        setDone(true);
-        window.scrollTo({top: 0, behavior:"smooth"});
-      } else {
-        setSendError(true);
-      }
+      }).catch(() => {});
+      setDone(true);
+      window.scrollTo({top: 0, behavior:"smooth"});
     } catch { setSendError(true); }
     finally { setSending(false); }
   };

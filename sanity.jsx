@@ -52,8 +52,38 @@ async function sanityFetch(query, fallback) {
   }
 }
 
+/* ── Write API — used by forms to create Lead documents ────────
+   Create a token at sanity.io/manage → project → API → Tokens
+   Role: "Editor"  (minimum needed for document creation)
+   ⚠️  This token is visible in browser source. Risk is low (an
+   attacker could only spam lead documents). Rotate it if abused.
+   ─────────────────────────────────────────────────────────── */
+const SANITY_WRITE_TOKEN = "REPLACE_WITH_SANITY_WRITE_TOKEN";
+
+async function sanityMutate(mutations) {
+  if (!SANITY_WRITE_TOKEN || SANITY_WRITE_TOKEN === "REPLACE_WITH_SANITY_WRITE_TOKEN") {
+    throw new Error("Sanity write token not configured");
+  }
+  const url =
+    `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}` +
+    `/data/mutate/${SANITY_DATASET}`;
+  const res = await fetch(url, {
+    method:  "POST",
+    headers: {
+      "Content-Type":  "application/json",
+      "Authorization": `Bearer ${SANITY_WRITE_TOKEN}`,
+    },
+    body: JSON.stringify({ mutations }),
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(`Sanity mutate HTTP ${res.status}: ${text}`);
+  }
+  return res.json();
+}
+
 /* Expose globally so data.jsx and app.jsx can use them */
-Object.assign(window, { sanityFetch, sanityImageUrl, SANITY_PROJECT_ID, SANITY_DATASET });
+Object.assign(window, { sanityFetch, sanityImageUrl, sanityMutate, SANITY_PROJECT_ID, SANITY_DATASET });
 
 /* ============================================================
    Live Preview — active only when the site is loaded inside

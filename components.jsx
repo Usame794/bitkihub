@@ -266,21 +266,31 @@ const QuoteModal = ({ product, onClose, t, lang }) => {
     setSending(true);
     setSendError(false);
     try {
-      const res = await fetch("https://formspree.io/f/REPLACE_WITH_YOUR_ENDPOINT", {
+      // Primary: save lead to Sanity CMS → visible in Studio dashboard
+      await sanityMutate([{ create: {
+        _type:           'lead',
+        createdAt:       new Date().toISOString(),
+        source:          'quote-modal',
+        plant:           `${product.name.en} (${product.latin})`,
+        email:           useEmail ? email : undefined,
+        phone:           useWA ? phone : undefined,
+        replyVia:        method,
+        deliveryCountry: deliveryCountry,
+      }}]);
+      // Backup: also fire Formspree email (silent, non-blocking)
+      fetch("https://formspree.io/f/REPLACE_WITH_YOUR_ENDPOINT", {
         method: "POST",
         headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
           _subject: `Quick Quote — ${product.name.en}`,
           plant: `${product.name.en} (${product.latin})`,
-          quantity: qty,
           reply_via: method,
           email: useEmail ? email : undefined,
           whatsapp_number: useWA ? phone : undefined,
           delivery_country: deliveryCountry,
         }),
-      });
-      if (res.ok) { setSubmitted(true); }
-      else { setSendError(true); }
+      }).catch(() => {});
+      setSubmitted(true);
     } catch { setSendError(true); }
     finally { setSending(false); }
   };
