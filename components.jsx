@@ -291,7 +291,7 @@ const QuoteModal = ({ product, onClose, t, lang }) => {
         }),
       }).catch(() => {});
       setSubmitted(true);
-    } catch { setSendError(true); }
+    } catch (err) { console.error("[Quote modal] submission error:", err); setSendError(true); }
     finally { setSending(false); }
   };
 

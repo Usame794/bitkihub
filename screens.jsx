@@ -623,7 +623,7 @@ const Contact = ({ t, lang, go }) => {
       }).catch(() => {});
       setDone(true);
       window.scrollTo({top: 0, behavior:"smooth"});
-    } catch { setSendError(true); }
+    } catch (err) { console.error("[Contact form] submission error:", err); setSendError(true); }
     finally { setSending(false); }
   };
 

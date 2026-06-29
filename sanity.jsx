@@ -67,17 +67,26 @@ async function sanityMutate(mutations) {
   const url =
     `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}` +
     `/data/mutate/${SANITY_DATASET}`;
-  const res = await fetch(url, {
-    method:  "POST",
-    headers: {
-      "Content-Type":  "application/json",
-      "Authorization": `Bearer ${SANITY_WRITE_TOKEN}`,
-    },
-    body: JSON.stringify({ mutations }),
-  });
+  let res;
+  try {
+    res = await fetch(url, {
+      method:  "POST",
+      headers: {
+        "Content-Type":  "application/json",
+        "Authorization": `Bearer ${SANITY_WRITE_TOKEN}`,
+      },
+      body: JSON.stringify({ mutations }),
+    });
+  } catch (networkErr) {
+    // Typically a CORS preflight failure or network outage
+    console.error("[Sanity] Network / CORS error:", networkErr);
+    throw networkErr;
+  }
   if (!res.ok) {
     const text = await res.text().catch(() => "");
-    throw new Error(`Sanity mutate HTTP ${res.status}: ${text}`);
+    const err = new Error(`Sanity mutate HTTP ${res.status}: ${text}`);
+    console.error("[Sanity] Mutate failed:", err.message);
+    throw err;
   }
   return res.json();
 }
