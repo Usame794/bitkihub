@@ -58,7 +58,7 @@ async function sanityFetch(query, fallback) {
    ⚠️  This token is visible in browser source. Risk is low (an
    attacker could only spam lead documents). Rotate it if abused.
    ─────────────────────────────────────────────────────────── */
-const SANITY_WRITE_TOKEN = "REPLACE_WITH_SANITY_WRITE_TOKEN";
+const SANITY_WRITE_TOKEN = "skONtxhjEmAQvNiwFLxJS3hhxUlBNXhhxZX0teTsHfofcWS2TLOTT66YSeLuP8GqB1mTc4bcDFnWtKMqQMHj4Ihq0Kb6zceZTy9k7OuAwSaHvcNN8d8dOACEugleAyzclea9Ss5YE4rix4aSam7VA88eqUOL4LOJUOgtQTaFbNAIgRH7ZFdR";
 
 async function sanityMutate(mutations) {
   if (!SANITY_WRITE_TOKEN || SANITY_WRITE_TOKEN === "REPLACE_WITH_SANITY_WRITE_TOKEN") {
