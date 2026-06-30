@@ -10,6 +10,7 @@ const SANITY_API_VERSION = "2024-01-01";
 
 /* ── Read token from config file loaded before this script ── */
 const SANITY_WRITE_TOKEN = (window.__BH && window.__BH.token) || "";
+console.log("[Sanity] Token loaded:", SANITY_WRITE_TOKEN ? `sk...${SANITY_WRITE_TOKEN.slice(-6)}` : "MISSING — app.config.js not loaded");
 
 /* ── Image URL builder ──────────────────────────────────────
    Converts a Sanity asset _ref like:
@@ -58,6 +59,8 @@ async function sanityMutate(mutations) {
   const url =
     `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}` +
     `/data/mutate/${SANITY_DATASET}`;
+  const reqBody = JSON.stringify({ mutations });
+  console.log("[Sanity] Mutate →", url, "\nHeaders: Content-Type: application/json, Authorization: Bearer sk..."+SANITY_WRITE_TOKEN.slice(-6), "\nBody:", reqBody);
   let res;
   try {
     res = await fetch(url, {
@@ -66,7 +69,7 @@ async function sanityMutate(mutations) {
         "Content-Type":  "application/json",
         "Authorization": `Bearer ${SANITY_WRITE_TOKEN}`,
       },
-      body: JSON.stringify({ mutations }),
+      body: reqBody,
     });
   } catch (networkErr) {
     console.error("[Sanity] Network / CORS error:", networkErr);
