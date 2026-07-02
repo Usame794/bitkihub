@@ -243,10 +243,10 @@ const HomeContactForm = ({ t, lang, go }) => {
         <LeafMark size={380} color="var(--brand)"/>
       </div>
       <div className="home-contact__left">
-        <h2>{lang==="en" ? "Talk to our trade desk." : "تحدّث مع قسم المبيعات."}</h2>
+        <h2>{lang==="en" ? "Talk to our trade desk." : "تواصل مع فريق المبيعات."}</h2>
         <p>{lang==="en"
           ? "Fastest channel is WhatsApp — drop your species list there and we'll quote the container."
-          : "أسرع طريقة هي واتساب — أرسل قائمة الأنواع وسنرد بعرض السعر."}</p>
+          : "أسرع طريقة للتواصل هي واتساب — أرسل لنا أنواع النباتات وسنرد بعرض السعر."}</p>
         <div className="home-contact__channels">
           <a className="home-contact__chan wa" href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener">
             <div className="ic">

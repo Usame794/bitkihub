@@ -82,7 +82,7 @@ const Products = ({ t, lang, go, initialCat, cardStyle }) => {
         {filtered.length === 0 && (
           <div style={{padding:"80px 0", textAlign:"center", color:"var(--text-soft)"}}>
             <Icon name="search" size={32}/>
-            <p style={{marginTop: 16}}>{lang==="en"?"No specimens match those filters.":"لا توجد نتائج مطابقة."}</p>
+            <p style={{marginTop: 16}}>{lang==="en"?"No specimens match those filters.":"لا توجد نباتات تطابق بحثك."}</p>
           </div>
         )}
       </div>

@@ -79,11 +79,11 @@ const Blog = ({ t, lang, go }) => {
             <Icon name="chev" size={12}/>
             <span>{t.nav.blog}</span>
           </div>
-          <h1>{lang==="en" ? "Field journal." : "يوميات الحقل."}</h1>
+          <h1>{lang==="en" ? "Field journal." : "مقالات ونصائح."}</h1>
           <p className="page-head__lede">
             {lang==="en"
               ? "Notes from Yalova, container math from the trade desk, and honest specimen advice from the people who grow them."
-              : "ملاحظات من يالوفا، تحليلات من قسم التجارة، ومشورة صريحة من الذين يربّون هذه النباتات."}
+              : "مقالات ونصائح من فريق المزرعة حول التنسيق وأنواع النباتات والشحن."}
           </p>
         </div>
       </div>
@@ -120,7 +120,7 @@ const Blog = ({ t, lang, go }) => {
                 </div>
                 <div className="blog-feature__cta">
                   <button className="btn btn--primary">
-                    {lang==="en" ? "Read the journal entry" : "اقرأ المقال"}
+                    {lang==="en" ? "Read the journal entry" : "اقرأ المزيد"}
                     <span className="arrow"><Icon name="arrow" size={14}/></span>
                   </button>
                 </div>
@@ -158,8 +158,8 @@ const Blog = ({ t, lang, go }) => {
           <div className="cta-band">
             <div className="cta-band__mark"><LeafMark size={460} color="#fff"/></div>
             <div style={{position:"relative", zIndex: 1, maxWidth: 600}}>
-              <h2>{lang==="en" ? "Get field notes in your inbox." : "تابع يوميات الحقل عبر بريدك."}</h2>
-              <p>{lang==="en" ? "Monthly digest. Specimen news, trade-desk updates, no fluff." : "ملخص شهري. أخبار النباتات، تحديثات الشحن، بلا حشو."}</p>
+              <h2>{lang==="en" ? "Get field notes in your inbox." : "تابع آخر المقالات والأخبار عبر بريدك."}</h2>
+              <p>{lang==="en" ? "Monthly digest. Specimen news, trade-desk updates, no fluff." : "رسالة شهرية. أخبار المزرعة، تحديثات الشحن، ونصائح نباتية مختصرة."}</p>
             </div>
             <div style={{position:"relative", zIndex: 1, display:"flex", gap: 10, alignItems:"center"}}>
               <input type="email" placeholder={lang==="en"?"you@company.com":"البريد الإلكتروني"}
@@ -211,7 +211,7 @@ const BlogPost = ({ t, lang, go, postId }) => {
 
         <div className="blog-post-footer">
           <button className="btn btn--ghost" onClick={()=>go("blog")}>
-            ← {lang==="en"?"Back to field journal":"العودة إلى يوميات الحقل"}
+            ← {lang==="en"?"Back to field journal":"العودة إلى المقالات"}
           </button>
           <button className="btn btn--primary" onClick={()=>go("contact")}>
             {t.requestQuote}
@@ -221,7 +221,7 @@ const BlogPost = ({ t, lang, go, postId }) => {
 
         {related.length > 0 && (
           <div className="blog-post-related">
-            <h3 style={{marginBottom: 24}}>{lang==="en"?"More from the journal":"المزيد من اليوميات"}</h3>
+            <h3 style={{marginBottom: 24}}>{lang==="en"?"More from the journal":"مقالات أخرى"}</h3>
             <div className="blog-grid">
               {related.map(p => (
                 <a key={p.id} href="#" className="blog-card"
@@ -258,11 +258,11 @@ const FAQ = ({ t, lang, go }) => {
             <Icon name="chev" size={12}/>
             <span>{t.nav.faq}</span>
           </div>
-          <h1>{lang==="en" ? "Questions, answered." : "أجوبة لأسئلتك."}</h1>
+          <h1>{lang==="en" ? "Questions, answered." : "الأسئلة الشائعة."}</h1>
           <p className="page-head__lede">
             {lang==="en"
               ? "Everything we typically explain on the first WhatsApp message — MOQs, ports, lead times, paperwork. If your question isn't here, our trade desk is one tap away."
-              : "كل ما نشرحه عادةً في أول محادثة واتساب — الحدود الدنيا، الموانئ، أوقات التنفيذ، الوثائق. لأي سؤال آخر، قسم التجارة على بُعد ضغطة زر."}
+              : "إجابات على الأسئلة الأكثر شيوعاً حول الطلب والشحن والتوثيق."}
           </p>
         </div>
       </div>
@@ -281,10 +281,10 @@ const FAQ = ({ t, lang, go }) => {
               ))}
             </div>
             <div className="faq-side__help">
-              <strong>{lang==="en" ? "Need a human?" : "تريد التحدث مع موظف؟"}</strong>
+              <strong>{lang==="en" ? "Need a human?" : "هل تريد التحدث مع أحد من فريقنا؟"}</strong>
               {lang==="en"
                 ? "WhatsApp our trade desk — average reply under an hour during business hours."
-                : "تواصل عبر الواتساب مع قسم التجارة — متوسط الرد أقل من ساعة."}
+                : "تواصل معنا عبر واتساب — نرد في أقل من ساعة"}
               <div style={{marginTop: 14}}>
                 <button className="btn btn--primary" style={{padding:"10px 14px", fontSize:13}} onClick={()=>go("contact")}>
                   {t.requestQuote}
