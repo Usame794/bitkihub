@@ -30,11 +30,10 @@ const Contact = ({ t, lang, go }) => {
     setErrors(e);
     if (Object.keys(e).length > 0) return;
 
-    if (!checkRateLimit()) { setSendError("rate"); return; }
-
     setSending(true);
     setSendError(false);
     try {
+      if (!checkRateLimit()) { setSendError("rate"); return; }
       await sanityMutate([{ create: {
         _type:           'lead',
         createdAt:       new Date().toISOString(),
@@ -127,7 +126,7 @@ const Contact = ({ t, lang, go }) => {
 
                   {/* Honeypot — hidden from humans, traps bots */}
                   <div style={{position:"absolute",left:"-9999px",width:"1px",height:"1px",overflow:"hidden"}} aria-hidden="true">
-                    <input tabIndex={-1} autoComplete="off" value={form._hp} onChange={e=>upd("_hp", e.target.value)} name="website"/>
+                    <input tabIndex={-1} autoComplete="off" value={form._hp} onChange={e=>upd("_hp", e.target.value)}/>
                   </div>
 
                   <div className="form-grid">
