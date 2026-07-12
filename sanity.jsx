@@ -59,8 +59,8 @@ async function sanityMutate(mutations) {
   const url =
     `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}` +
     `/data/mutate/${SANITY_DATASET}`;
-  const reqBody = JSON.stringify({ mutations });
-  console.log("[Sanity] Mutate →", url, "\nHeaders: Content-Type: application/json, Authorization: Bearer sk..."+SANITY_WRITE_TOKEN.slice(-6), "\nBody:", reqBody);
+  const reqBody = JSON.stringify({ mutations, returnIds: true });
+  console.log("[Sanity] Mutate →", url, "body:", reqBody);
   let res;
   try {
     res = await fetch(url, {
@@ -72,7 +72,7 @@ async function sanityMutate(mutations) {
       body: reqBody,
     });
   } catch (networkErr) {
-    console.error("[Sanity] Network / CORS error:", networkErr);
+    console.error("[Sanity] Network / CORS error — is bitkihub.com in Sanity CORS origins?", networkErr);
     throw networkErr;
   }
   if (!res.ok) {
@@ -81,7 +81,9 @@ async function sanityMutate(mutations) {
     console.error("[Sanity] Mutate failed:", err.message);
     throw err;
   }
-  return res.json();
+  const json = await res.json();
+  console.log("[Sanity] Mutate ← OK", JSON.stringify(json));
+  return json;
 }
 
 /* ── Rate limiter — max 3 form submissions per minute per session ─── */

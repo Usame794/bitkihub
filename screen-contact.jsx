@@ -220,21 +220,44 @@ const Contact = ({ t, lang, go }) => {
   );
 };
 
-/* ── Home contact form — compact embed, no Sanity write ───── */
+/* ── Home contact form — compact embed ───────────────────── */
 const HomeContactForm = ({ t, lang, go }) => {
   const [form, setForm] = _cS({ name: "", email: "", phone: "", phoneCountry: "SA", company: "", message: "" });
-  const [done, setDone] = _cS(false);
-  const [errors, setErrors] = _cS({});
+  const [done, setDone]       = _cS(false);
+  const [errors, setErrors]   = _cS({});
+  const [sending, setSending] = _cS(false);
+  const [sendError, setSendError] = _cS(false);
   const phone    = "+90 501 320 09 87";
   const waNumber = "905013200987";
   const upd = (k, v) => setForm({ ...form, [k]: v });
-  const submit = () => {
+  const submit = async () => {
     const e = {};
     if (!form.name) e.name = true;
     if (!form.email || !form.email.includes("@")) e.email = true;
     if (!form.phone) e.phone = true;
     setErrors(e);
-    if (Object.keys(e).length === 0) setDone(true);
+    if (Object.keys(e).length > 0) return;
+    setSending(true);
+    setSendError(false);
+    try {
+      if (!checkRateLimit()) { setSendError(true); return; }
+      await sanityMutate([{ create: {
+        _type:     'lead',
+        createdAt: new Date().toISOString(),
+        source:    'contact-form',
+        name:      sanitizeField(form.name, 200),
+        company:   sanitizeField(form.company, 200) || undefined,
+        email:     sanitizeField(form.email, 200),
+        phone:     sanitizeField(form.phone, 30) || undefined,
+        message:   sanitizeField(form.message, 1000) || undefined,
+      }}]);
+      setDone(true);
+    } catch (err) {
+      console.error("[HomeContactForm] submission error:", err);
+      setSendError(true);
+    } finally {
+      setSending(false);
+    }
   };
   return (
     <div className="home-contact">
@@ -301,15 +324,20 @@ const HomeContactForm = ({ t, lang, go }) => {
                   <textarea style={{minHeight: 100}} value={form.message} onChange={e=>upd("message", e.target.value)} placeholder={lang==="en"?"e.g. 200× Phoenix dactylifera 2.5m to Jeddah by August.":"اكتب الأنواع والكميات"}/>
                 </div>
               </div>
+              {sendError && (
+                <div style={{color:"#c0392b",fontSize:13,marginBottom:10,padding:"8px 12px",background:"rgba(192,57,43,.08)",borderRadius:8}}>
+                  {lang==="en" ? "Something went wrong. Please try again or email info@bitkihub.com" : "حدث خطأ. يرجى المحاولة مجدداً أو التواصل عبر info@bitkihub.com"}
+                </div>
+              )}
               <div className="form-submit-row">
                 <small>{lang==="en" ? "Or send the full project list on our contact page." : "أو أرسل القائمة الكاملة عبر صفحة التواصل."}</small>
                 <div style={{display:"flex", gap: 8}}>
                   <button className="btn btn--ghost" onClick={()=>go("contact")}>
                     {lang==="en" ? "Full form" : "النموذج الكامل"}
                   </button>
-                  <button className="btn btn--dark" onClick={submit}>
-                    {t.submit}
-                    <span className="arrow"><Icon name="arrow" size={14}/></span>
+                  <button className="btn btn--dark" onClick={submit} disabled={sending}>
+                    {sending ? (lang==="en" ? "Sending…" : "جارٍ الإرسال…") : t.submit}
+                    {!sending && <span className="arrow"><Icon name="arrow" size={14}/></span>}
                   </button>
                 </div>
               </div>
