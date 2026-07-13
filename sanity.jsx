@@ -60,7 +60,7 @@ async function sanityMutate(mutations) {
     `https://${SANITY_PROJECT_ID}.api.sanity.io/v${SANITY_API_VERSION}` +
     `/data/mutate/${SANITY_DATASET}`;
   const reqBody = JSON.stringify({ mutations, returnIds: true });
-  console.log("[Sanity] Mutate →", url, "body:", reqBody);
+  console.log("[Sanity] Mutate →", url);
   let res;
   try {
     res = await fetch(url, {

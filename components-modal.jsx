@@ -28,7 +28,7 @@ const QuoteModal = ({ product, onClose, t, lang }) => {
     if (_hp) return; // bot detected — silently reject
 
     const e = {};
-    if (useEmail && (!email || !email.includes("@"))) e.email = true;
+    if (useEmail && (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))) e.email = true;
     if (useWA && !phone) e.phone = true;
     setErrors(e);
     if (Object.keys(e).length > 0) return;
@@ -47,18 +47,6 @@ const QuoteModal = ({ product, onClose, t, lang }) => {
         replyVia:        method,
         deliveryCountry: sanitizeField(deliveryCountry, 100),
       }}]);
-      fetch("https://formspree.io/f/REPLACE_WITH_YOUR_ENDPOINT", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({
-          _subject: `Quick Quote — ${product.name.en}`,
-          plant: `${product.name.en} (${product.latin})`,
-          reply_via: method,
-          email: useEmail ? email : undefined,
-          whatsapp_number: useWA ? phone : undefined,
-          delivery_country: deliveryCountry,
-        }),
-      }).catch(() => {});
       setSubmitted(true);
     } catch (err) {
       console.error("[Quote modal] submission error:", err);

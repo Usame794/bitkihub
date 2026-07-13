@@ -25,7 +25,7 @@ const Contact = ({ t, lang, go }) => {
 
     const e = {};
     if (!form.name) e.name = true;
-    if (!form.email || !form.email.includes("@")) e.email = true;
+    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = true;
     if (!form.company) e.company = true;
     setErrors(e);
     if (Object.keys(e).length > 0) return;
@@ -46,17 +46,6 @@ const Contact = ({ t, lang, go }) => {
         deliveryCountry: sanitizeField(form.country, 100),
         message:         sanitizeField(form.message, 1000) || undefined,
       }}]);
-      fetch("https://formspree.io/f/REPLACE_WITH_YOUR_ENDPOINT", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({
-          _subject:        `Contact Form — ${form.name} (${form.company})`,
-          name:            form.name,    company:         form.company,
-          email:           form.email,   phone:           form.phone,
-          buyer_type:      form.buyer,   delivery_country: form.country,
-          species_interest: form.species, message:         form.message,
-        }),
-      }).catch(() => {});
       setDone(true);
       window.scrollTo({top: 0, behavior:"smooth"});
     } catch (err) {
@@ -222,7 +211,7 @@ const Contact = ({ t, lang, go }) => {
 
 /* ── Home contact form — compact embed ───────────────────── */
 const HomeContactForm = ({ t, lang, go }) => {
-  const [form, setForm] = _cS({ name: "", email: "", phone: "", phoneCountry: "SA", company: "", message: "" });
+  const [form, setForm] = _cS({ name: "", email: "", phone: "", phoneCountry: "SA", company: "", message: "", _hp: "" });
   const [done, setDone]       = _cS(false);
   const [errors, setErrors]   = _cS({});
   const [sending, setSending] = _cS(false);
@@ -231,9 +220,10 @@ const HomeContactForm = ({ t, lang, go }) => {
   const waNumber = "905013200987";
   const upd = (k, v) => setForm({ ...form, [k]: v });
   const submit = async () => {
+    if (form._hp) return;
     const e = {};
     if (!form.name) e.name = true;
-    if (!form.email || !form.email.includes("@")) e.email = true;
+    if (!form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = true;
     if (!form.phone) e.phone = true;
     setErrors(e);
     if (Object.keys(e).length > 0) return;
@@ -300,6 +290,10 @@ const HomeContactForm = ({ t, lang, go }) => {
         <div className="contact-form" style={{padding: 0, background: "transparent", border: "none"}}>
           {!done ? (
             <>
+              {/* Honeypot — hidden from humans, traps bots */}
+              <div style={{position:"absolute",left:"-9999px",width:"1px",height:"1px",overflow:"hidden"}} aria-hidden="true">
+                <input tabIndex={-1} autoComplete="off" value={form._hp} onChange={e=>upd("_hp", e.target.value)}/>
+              </div>
               <div className="form-grid">
                 <div className={`field ${errors.name ? "field--error" : ""}`}>
                   <label>{t.fields.name} *</label>

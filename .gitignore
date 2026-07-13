@@ -3,6 +3,11 @@
 .env.local
 .env.*.local
 
+# Sanity write token — kept locally and on GitHub Pages, but never re-committed
+# To update: edit app.config.js locally, then manually push that one file
+app.config.js
+_app.config.js
+
 # macOS
 .DS_Store
 
